@@ -9,4 +9,6 @@ router.get("/new", controller.new_username);
 
 router.post("/new", controller.submit_new_username);
 
+router.get("/search", controller.search_username);
+
 module.exports = router;

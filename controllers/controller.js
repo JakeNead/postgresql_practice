@@ -18,6 +18,11 @@ exports.home = async (req, res) => {
         </ul>
 
         <button><a href='/new'>Add user </a></button>
+        <form action="/search" method="get">
+        <label for="search"></label>
+          <input type="text" name="search" id="search"></input>
+          <button type="submit">Search users</button>
+        </form>
       </body>
     </html>
   `;
@@ -36,5 +41,20 @@ exports.submit_new_username = async (req, res) => {
     res.redirect("/");
   } catch (err) {
     console.log(err);
+  }
+};
+
+exports.search_username = async (req, res) => {
+  try {
+    const searchResult = await query.searchUsername(req.query.search);
+    if (searchResult) {
+      // res.status().send(`searchResult[0].id, ${searchResult[0].username}`);
+      res.send(
+        `ID: ${searchResult[0].id} Username: ${searchResult[0].username}`
+      );
+    }
+  } catch (err) {
+    console.log(err);
+    res.send("search failed");
   }
 };
