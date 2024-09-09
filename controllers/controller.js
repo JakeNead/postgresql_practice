@@ -1,40 +1,23 @@
 const path = require("path");
 const query = require("../db/queries");
 
+function deleteUser(id) {
+  console.log("id: ", id);
+}
+
 exports.home = async (req, res) => {
   try {
     const usernames = await query.getAllUserNames();
-    const htmlList = `
-    <html>
-      <head>
-        <title>Usernames</title>
-      </head>
-      <body>
-        <h1>List of Usernames</h1>
-        <ul style="list-style: none">
-          ${usernames
-            .map((username) => `<li>${username.username}</li>`)
-            .join("")}
-        </ul>
-
-        <button><a href='/new'>Add user </a></button>
-        <form action="/search" method="get">
-        <label for="search"></label>
-          <input type="text" name="search" id="search"></input>
-          <button type="submit">Search users</button>
-        </form>
-      </body>
-    </html>
-  `;
-    res.send(htmlList);
+    res.render("home", { usernames: usernames, deleteUser: deleteUser });
   } catch (err) {
     res.send(err);
   }
 };
 
 exports.new_username = (req, res) => {
-  res.sendFile(path.join(__dirname, "../views", "usernameForm.html"));
+  res.render("usernameForm");
 };
+
 exports.submit_new_username = async (req, res) => {
   try {
     await query.insertUsername(req.body.username);
@@ -47,14 +30,16 @@ exports.submit_new_username = async (req, res) => {
 exports.search_username = async (req, res) => {
   try {
     const searchResult = await query.searchUsername(req.query.search);
-    if (searchResult) {
-      // res.status().send(`searchResult[0].id, ${searchResult[0].username}`);
-      res.send(
-        `ID: ${searchResult[0].id} Username: ${searchResult[0].username}`
-      );
-    }
+    res.send(`ID: ${searchResult[0].id} Username: ${searchResult[0].username}`);
   } catch (err) {
-    console.log(err);
+    console.log("search_username error", err);
     res.send("search failed");
   }
+};
+
+exports.delete_user = async (req, res) => {
+  try {
+    await query.deleteUser(req.params.id);
+    res.redirect("/");
+  } catch {}
 };
